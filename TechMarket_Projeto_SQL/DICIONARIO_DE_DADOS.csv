@@ -1,0 +1,52 @@
+﻿TABELA;COLUNA;TIPO_MYSQL;ACEITA_NULL;CHAVE_OU_REGRA;DESCRICAO_E_REGRA_DE_NEGOCIO
+cliente;id_cliente;INT;NAO;PK;Identificador automatico do cliente.
+cliente;nome;VARCHAR(100);NAO;-;Nome completo do cliente.
+cliente;cpf;CHAR(11);NAO;UQ;"Onze digitos, sem pontuacao; unico por cliente."
+cliente;email;VARCHAR(120);NAO;UQ;E-mail unico do cliente.
+cliente;telefone;VARCHAR(20);SIM;-;Contato opcional.
+cliente;data_nascimento;DATE;SIM;-;Data de nascimento opcional.
+cliente;data_cadastro;DATETIME;NAO;DEFAULT CURRENT_TIMESTAMP;Data/hora do cadastro.
+cliente;ativo;TINYINT(1);NAO;CHECK + DEFAULT 1;"1 = ativo; 0 = inativo."
+endereco_entrega;id_endereco;INT;NAO;PK / UQ composta;"Identificador automatico; parte da unicidade (id_endereco, id_cliente)."
+endereco_entrega;id_cliente;INT;NAO;FK cliente / UQ composta;"Proprietario do endereco; necessario para validar pedido."
+endereco_entrega;logradouro;VARCHAR(120);NAO;-;Rua/avenida do endereco.
+endereco_entrega;numero;VARCHAR(10);NAO;-;Numero do endereco (pode incluir letras).
+endereco_entrega;complemento;VARCHAR(60);SIM;-;Apartamento, bloco etc.
+endereco_entrega;bairro;VARCHAR(60);NAO;-;Bairro do endereco.
+endereco_entrega;cidade;VARCHAR(60);NAO;-;Municipio de entrega.
+endereco_entrega;uf;CHAR(2);NAO;CHECK;Sigla da unidade federativa (2 caracteres).
+endereco_entrega;cep;CHAR(8);NAO;CHECK;CEP com 8 digitos, sem hifen.
+endereco_entrega;principal;TINYINT(1);NAO;CHECK + DEFAULT 0;"1 = endereco preferencial; 0 = secundario."
+categoria;id_categoria;INT;NAO;PK;Identificador automatico da categoria.
+categoria;nome;VARCHAR(60);NAO;UQ;Nome unico da categoria.
+categoria;descricao;VARCHAR(200);SIM;-;Resumo opcional sobre a categoria.
+produto;id_produto;INT;NAO;PK;Identificador automatico do produto.
+produto;id_categoria;INT;NAO;FK categoria;Cada produto pertence a uma categoria.
+produto;nome;VARCHAR(100);NAO;INDEX;Nome pesquisavel do produto.
+produto;descricao;VARCHAR(255);SIM;-;Detalhes opcionais do produto.
+produto;preco;DECIMAL(10,2);NAO;CHECK;"Preco atual; deve ser maior ou igual a zero."
+produto;estoque;INT;NAO;CHECK + DEFAULT 0;Saldo nao negativo do estoque.
+produto;ativo;TINYINT(1);NAO;CHECK + DEFAULT 1;"1 = disponivel; 0 = descontinuado/inativo."
+produto;data_cadastro;DATETIME;NAO;DEFAULT CURRENT_TIMESTAMP;Momento de inclusao no catalogo.
+pedido;id_pedido;INT;NAO;PK;Identificador automatico do pedido.
+pedido;id_cliente;INT;NAO;FK cliente / FK composta endereco;Cliente do pedido e dono do endereco escolhido.
+pedido;id_endereco;INT;NAO;FK composta endereco;Endereco deve pertencer ao cliente do pedido.
+pedido;data_pedido;DATETIME;NAO;DEFAULT CURRENT_TIMESTAMP;Momento do pedido.
+pedido;status;ENUM('PENDENTE','PAGO','SEPARACAO','ENVIADO','ENTREGUE','CANCELADO');NAO;DEFAULT PENDENTE;Estado logístico/comercial do pedido.
+pedido;valor_frete;DECIMAL(10,2);NAO;CHECK + DEFAULT 0;Frete nao negativo.
+pedido;valor_total;DECIMAL(10,2);NAO;CHECK;Soma dos itens + frete (mantida na aplicacao).
+item_pedido;id_item;INT;NAO;PK;Identificador automatico do item.
+item_pedido;id_pedido;INT;NAO;FK pedido / UQ composta;Pedido que contem o item.
+item_pedido;id_produto;INT;NAO;FK produto / UQ composta;"Produto; um mesmo produto aparece uma vez por pedido."
+item_pedido;quantidade;INT;NAO;CHECK;Quantidade inteira positiva.
+item_pedido;preco_unitario;DECIMAL(10,2);NAO;CHECK;"Preco congelado no momento da venda; nao negativo."
+forma_pagamento;id_forma_pagamento;INT;NAO;PK;Identificador automatico da forma.
+forma_pagamento;descricao;VARCHAR(40);NAO;UQ;Nome unico do meio de pagamento.
+forma_pagamento;permite_parcelamento;TINYINT(1);NAO;CHECK + DEFAULT 0;"1 = aceita parcelas; 0 = a vista."
+pagamento;id_pagamento;INT;NAO;PK;Identificador automatico do registro de pagamento.
+pagamento;id_pedido;INT;NAO;FK pedido;Pedido a que o pagamento se refere.
+pagamento;id_forma_pagamento;INT;NAO;FK forma_pagamento;Modalidade usada.
+pagamento;valor;DECIMAL(10,2);NAO;CHECK;Valor do pagamento, nao negativo.
+pagamento;parcelas;INT;NAO;CHECK + DEFAULT 1;Quantidade de parcelas maior ou igual a 1.
+pagamento;data_pagamento;DATETIME;SIM;CHECK condicional;"Data obrigatoria se status = APROVADO; senao opcional."
+pagamento;status;ENUM('PENDENTE','APROVADO','RECUSADO','CANCELADO','ESTORNADO');NAO;DEFAULT PENDENTE;Situacao do pagamento.

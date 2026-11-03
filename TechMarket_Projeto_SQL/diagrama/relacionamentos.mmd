@@ -1,0 +1,9 @@
+erDiagram
+    CLIENTE ||--o{ ENDERECO_ENTREGA : possui
+    CLIENTE ||--o{ PEDIDO : realiza
+    ENDERECO_ENTREGA ||--o{ PEDIDO : destino
+    CATEGORIA ||--o{ PRODUTO : classifica
+    PEDIDO ||--o{ ITEM_PEDIDO : contem
+    PRODUTO ||--o{ ITEM_PEDIDO : vendido_em
+    PEDIDO ||--o{ PAGAMENTO : recebe
+    FORMA_PAGAMENTO ||--o{ PAGAMENTO : usada_em
